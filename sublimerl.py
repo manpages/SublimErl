@@ -55,7 +55,6 @@ class SublimErlLauncher():
 		self.available = False
 		# paths
 		self.rebar_path = None
-		self.erl_path = None
 		self.escript_path = None
 		self.dialyzer_path = None
 		# test vars
@@ -147,12 +146,6 @@ class SublimErlLauncher():
 		self.rebar_path = settings.get('rebar_path', self.get_exe_path('rebar'))
 		if self.rebar_path == None or not os.path.exists(self.rebar_path):
 			self.log_error("Rebar cannot be found, please download and install from <https://github.com/basho/rebar>.")
-			return
-
-		# erl check
-		self.erl_path = settings.get('erl_path', self.get_exe_path('erl'))
-		if self.erl_path == None or not os.path.exists(self.erl_path):
-			self.log_error("Erlang binary (erl) cannot be found.")
 			return
 
 		# escript check
@@ -332,7 +325,7 @@ class SublimErlTestRunner(SublimErlLauncher):
 			# get function name and arguments
 			m = re.match(r"((?:[a-zA-Z0-9_]*)_test_)\s*\(\s*\)\s*->(?:.|\n)", self.view.substr(matching_region))
 			if m != None:
-				return "%s/0" % m.group(1)
+				return m.group(1)
 
 	def start_eunit_test(self):
 		global SUBLIMERL
@@ -430,11 +423,9 @@ class SublimErlTestRunner(SublimErlLauncher):
 		self.interpret_eunit_test_results(retcode, data)
 
 	def run_single_eunit_test(self, module_tests_name, function_name):
-		# build & run erl command
-		mod_function = "%s:%s" % (module_tests_name, function_name)
-		erl_command = "-noshell -pa .eunit -eval \"eunit:test({generator, fun %s})\" -s init stop" % mod_function
-
-		retcode, data = self.execute_os_command('%s %s' % (self.erl_path, erl_command), dir_type='test', block=False)
+		# build & run rebar generator command
+		generator_name = "%s:%s" % (module_tests_name, function_name)
+		retcode, data = self.execute_os_command('%s eunit generator=%s' % (self.rebar_path, generator_name), dir_type='test', block=False)
 		# interpret
 		self.interpret_eunit_test_results(retcode, data)
 
