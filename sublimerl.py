@@ -458,7 +458,7 @@ class SublimErlTestRunner(SublimErlLauncher):
 	def compile_eunit_no_run(self):
 		# call rebar to compile -  HACK: passing in a non-existing suite forces rebar to not run the test suite
 		global SUBLIMERL
-		os_cmd = '%s eunit suites=sublimerl_unexisting_test' % self.rebar_path
+		os_cmd = '%s eunit clean suites=sublimerl_unexisting_test' % self.rebar_path
 		if SUBLIMERL['app_name']: os_cmd += ' apps=%s' % SUBLIMERL['app_name']
 		retcode, data = self.execute_os_command(os_cmd, dir_type='root', block=True)
 
@@ -479,7 +479,7 @@ class SublimErlTestRunner(SublimErlLauncher):
 
 	def compile_eunit_run_suite(self, suite):
 		global SUBLIMERL
-		os_cmd = '%s eunit suites=%s' % (self.rebar_path, suite)
+		os_cmd = '%s eunit clean suites=%s' % (self.rebar_path, suite)
 		if SUBLIMERL['app_name']: os_cmd += ' apps=%s' % SUBLIMERL['app_name']
 		retcode, data = self.execute_os_command(os_cmd, dir_type='root', block=False)
 		# interpret
