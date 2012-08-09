@@ -54,6 +54,7 @@ class SublimErlLauncher():
 		self.env = None
 		self.show_log = show_log
 		self.available = False
+		self.settings = sublime.load_settings('SublimErl.sublime-settings')
 		# paths
 		self.rebar_path = None
 		self.erl_path = None
@@ -145,8 +146,6 @@ class SublimErlLauncher():
 		self.available = True
 
 	def get_paths(self):
-		settings = sublime.load_settings('SublimErl.sublime-settings')
-
 		def log(message):
 			print "SublimErl Init Error: %s" % message
 			self.log_error(message)
@@ -155,25 +154,25 @@ class SublimErlLauncher():
 			return path != None and os.path.exists(path)
 
 		# rebar
-		self.rebar_path = settings.get('rebar_path', self.get_exe_path('rebar'))
+		self.rebar_path = self.settings.get('rebar_path', self.get_exe_path('rebar'))
 		if test_path(self.rebar_path) == False:
 			log("Rebar cannot be found, please download and install from <https://github.com/basho/rebar>.")
 			return
 
 		# erl check
-		self.erl_path = settings.get('erl_path', self.get_exe_path('erl'))
+		self.erl_path = self.settings.get('erl_path', self.get_exe_path('erl'))
 		if test_path(self.erl_path) == False:
 			log("Erlang binary (erl) cannot be found.")
 			return
 
 		# escript check
-		self.escript_path = settings.get('escript_path', self.get_exe_path('escript'))
+		self.escript_path = self.settings.get('escript_path', self.get_exe_path('escript'))
 		if test_path(self.escript_path) == False:
 			log("Erlang binary (escript) cannot be found.")
 			return
 
 		# dialyzer check
-		self.dialyzer_path = settings.get('dialyzer_path', self.get_exe_path('dialyzer'))
+		self.dialyzer_path = self.settings.get('dialyzer_path', self.get_exe_path('dialyzer'))
 		if test_path(self.dialyzer_path) == False:
 			log("Erlang Dyalizer cannot be found.")
 			return
@@ -458,7 +457,8 @@ class SublimErlTestRunner(SublimErlLauncher):
 	def compile_eunit_no_run(self):
 		# call rebar to compile -  HACK: passing in a non-existing suite forces rebar to not run the test suite
 		global SUBLIMERL
-		os_cmd = '%s eunit clean suites=sublimerl_unexisting_test' % self.rebar_path
+		clean = 'clean' if self.settings.get('clean_after_tests') else '' # it'd be organic to add self.eunit_clean, but I'm too shy
+		os_cmd = '%s eunit %s suites=sublimerl_unexisting_test' % (self.rebar_path, clean)
 		if SUBLIMERL['app_name']: os_cmd += ' apps=%s' % SUBLIMERL['app_name']
 		retcode, data = self.execute_os_command(os_cmd, dir_type='root', block=True)
 
@@ -479,6 +479,7 @@ class SublimErlTestRunner(SublimErlLauncher):
 
 	def compile_eunit_run_suite(self, suite):
 		global SUBLIMERL
+		clean = 'clean' if self.settings.get('clean_after_tests') else '' # it'd be organic to add self.eunit_clean, but I'm too shy
 		os_cmd = '%s eunit clean suites=%s' % (self.rebar_path, suite)
 		if SUBLIMERL['app_name']: os_cmd += ' apps=%s' % SUBLIMERL['app_name']
 		retcode, data = self.execute_os_command(os_cmd, dir_type='root', block=False)

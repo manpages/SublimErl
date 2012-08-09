@@ -6,6 +6,10 @@
 	 * "rebar_path": "/usr/local/bin/rebar",
 	 * "erl_path": "/usr/local/bin/erl",
 	 * "escript_path": "/usr/local/bin/escript",
-	 * "dialyzer_path": "/usr/local/bin/dialyzer"
+	 * "dialyzer_path": "/usr/local/bin/dialyzer",
+	 *
+	 * Also, SublimErl tends to use reasonable defaults, but here are some configurable parameters:
+	 * "clean_after_tests": True
+	 *
 	 */
 }
