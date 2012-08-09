@@ -27,7 +27,7 @@
 # ==========================================================================================================
 
 import sublime, sublime_plugin
-import sys, os, re, subprocess, threading, webbrowser, pprint
+import sys, os, re, subprocess, threading, webbrowser
 
 # globals
 SUBLIMERL_VERSION = '0.3-dev'
