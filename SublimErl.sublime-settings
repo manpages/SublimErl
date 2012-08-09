@@ -9,7 +9,7 @@
 	 * "dialyzer_path": "/usr/local/bin/dialyzer",
 	 *
 	 * Also, SublimErl tends to use reasonable defaults, but here are some configurable parameters:
-	 * "clean_after_tests": True
+	 * "clean_after_tests": "True"
 	 *
 	 */
 }

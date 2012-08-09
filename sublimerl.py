@@ -27,7 +27,7 @@
 # ==========================================================================================================
 
 import sublime, sublime_plugin
-import sys, os, re, subprocess, threading, webbrowser
+import sys, os, re, subprocess, threading, webbrowser, pprint
 
 # globals
 SUBLIMERL_VERSION = '0.3-dev'
@@ -457,12 +457,14 @@ class SublimErlTestRunner(SublimErlLauncher):
 	def compile_eunit_no_run(self):
 		# call rebar to compile -  HACK: passing in a non-existing suite forces rebar to not run the test suite
 		global SUBLIMERL
-		clean = 'clean' if self.settings.get('clean_after_tests') else '' # it'd be organic to add self.eunit_clean, but I'm too shy
+		clean = ''
+		if self.settings.get('clean_after_tests', False):  # it'd be organic to add self.eunit_clean, but I'm too shy 
+			clean = 'clean'
 		os_cmd = '%s eunit %s suites=sublimerl_unexisting_test' % (self.rebar_path, clean)
 		if SUBLIMERL['app_name']: os_cmd += ' apps=%s' % SUBLIMERL['app_name']
 		retcode, data = self.execute_os_command(os_cmd, dir_type='root', block=True)
 
-		if re.search(r"There were no tests to run", data) != None:
+		if re.search("There were no tests to run", data) != None:
 			# expected error returned (due to the hack)
 			return 0
 		# interpret
@@ -479,8 +481,10 @@ class SublimErlTestRunner(SublimErlLauncher):
 
 	def compile_eunit_run_suite(self, suite):
 		global SUBLIMERL
-		clean = 'clean' if self.settings.get('clean_after_tests') else '' # it'd be organic to add self.eunit_clean, but I'm too shy
-		os_cmd = '%s eunit clean suites=%s' % (self.rebar_path, suite)
+		clean = ''
+		if self.settings.get('clean_after_tests', False): # it'd be organic to add self.eunit_clean, but I'm too shy
+			clean = 'clean'
+		os_cmd = '%s eunit %s suites=%s' % (self.rebar_path, clean, suite)
 		if SUBLIMERL['app_name']: os_cmd += ' apps=%s' % SUBLIMERL['app_name']
 		retcode, data = self.execute_os_command(os_cmd, dir_type='root', block=False)
 		# interpret
